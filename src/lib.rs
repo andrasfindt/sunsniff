@@ -26,6 +26,8 @@ pub mod influxdb2;
 pub mod modbus;
 #[cfg(feature = "mqtt")]
 pub mod mqtt;
+#[cfg(feature = "prometheus")]
+pub mod prometheus;
 #[cfg(feature = "pcap")]
 pub mod pcap;
 pub mod receiver;

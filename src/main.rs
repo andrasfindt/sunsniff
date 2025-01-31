@@ -29,6 +29,8 @@ use sunsniff::influxdb2::Influxdb2Receiver;
 use sunsniff::modbus::ModbusConfig;
 #[cfg(feature = "mqtt")]
 use sunsniff::mqtt::MqttReceiver;
+#[cfg(feature = "prometheus")]
+use sunsniff::prometheus::PrometheusReceiver;
 #[cfg(feature = "pcap")]
 use sunsniff::pcap::PcapConfig;
 use sunsniff::receiver::{Receiver, Update, UpdateItem};
@@ -62,6 +64,9 @@ struct Config {
     #[cfg(feature = "mqtt")]
     #[serde(default)]
     mqtt: Vec<sunsniff::mqtt::Config>,
+    #[cfg(feature = "prometheus")]
+    #[serde(default)]
+    prometheus: Vec<sunsniff::prometheus::Config>,
 }
 
 /// Top-level execution. Receive updates from a stream and distribute them to
@@ -99,6 +104,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     {
         for backend in config.mqtt.iter() {
             receivers.push(Box::new(MqttReceiver::new(backend)?));
+        }
+    }
+    #[cfg(feature = "prometheus")]
+    {
+        for backend in config.prometheus.iter() {
+            receivers.push(Box::new(PrometheusReceiver::new(backend).await));
         }
     }
 
